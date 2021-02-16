@@ -1,0 +1,28 @@
+{
+  "name": "pm2-pull-reload",
+  "version": "1.0.0",
+  "description": "PM2 Module to pull from Git/Subversion/Mercurial repository and reload processes",
+  "main": "app.js",
+  "dependencies": {
+    "async": "*",
+    "pm2": "*",
+    "pmx": "beta",
+    "vizion": "*"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/keymetrics/pmx.git"
+  },
+  "config": {
+    "interval": 60000
+  },
+  "apps": [
+    {
+      "merge_logs": true,
+      "max_memory_restart": "200M",
+      "script": "app.js"
+    }
+  ],
+  "author": "Keymetrics Inc.",
+  "license": "MIT"
+}
