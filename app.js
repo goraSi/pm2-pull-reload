@@ -119,6 +119,14 @@ var execSeries = function (cmds, cb) {
   });
 }
 
+var groupBy = function (items, key) {
+  return items.reduce(function (result, item) {
+    //(result[item[key]] = result[item[key]] || []).push(item);
+    result[item[key]] = item;
+    return result;
+  }, {});
+};
+
 var pull = function (cb) {
   pm2.list(function (err, procs) {
     if (err) {
@@ -126,9 +134,8 @@ var pull = function (cb) {
       return cb();
     }
 
-    async.forEachLimit(procs, 1, function (proc, next) {
-      if (proc.pm2_env && proc.pm2_env.versioning && proc.pm2_env.status === 'online') {
-
+    async.eachSeries(groupBy(procs, 'name'), function (proc, next) {
+      if (proc.pm2_env && proc.pm2_env.versioning) {
         vizion.update({ folder: proc.pm2_env.pm_cwd }, function (err, meta) {
           if (err) return next(err);
 
@@ -141,10 +148,12 @@ var pull = function (cb) {
             ]
             execSeries(commands, function (err) {
               if (err) return next(err);
+              if (proc.pm2_env.status !== 'online') return next();
 
-              pm2.reload(proc.name);
-              console.log((new Date()).toISOString() + `: Successfully reloaded process "${proc.name}"`);
-              return next();
+              pm2.reload(proc.name, function () {
+                console.log((new Date()).toISOString() + `: Successfully reloaded process "${proc.name}"`);
+                return next();
+              });
             })
           } else {
             return next();
@@ -159,4 +168,3 @@ var pull = function (cb) {
     });
   });
 }
-
