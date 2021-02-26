@@ -1,6 +1,6 @@
 {
   "name": "pm2-pull-reload",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "PM2 Module to pull from Git/Subversion/Mercurial repository and reload processes",
   "main": "app.js",
   "dependencies": {
